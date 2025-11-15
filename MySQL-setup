@@ -1,0 +1,52 @@
+ Login to the db vm
+ $ vagrant ssh db01
+
+ Verify Hosts entry, if entries missing update the it with IP and hostnames
+ # cat /etc/hosts
+
+ Update OS with latest patches
+ # dnf update-y
+
+ Set Repository
+ # dnf install epel-release-y
+
+ Install Maria DB Package
+ # dnf install git mariadb-server-y
+
+ Starting & enabling mariadb-server
+ # systemctl start mariadb
+ # systemctl enable mariadb
+
+RUNmysqlsecureinstallationscript.
+ # mysql_secure_installation
+ NOTE:Setdbrootpassword, Iwillbeusingadmin123aspassword
+
+SetDBnameandusers.
+ # mysql-u root-padmin123
+ mysql> create database accounts;
+ mysql> grant all privileges on accounts.* TO 'admin'@'localhost' identified by
+ 'admin123';
+ mysql> grant all privileges on accounts.* TO 'admin'@'%' identified by 'admin123';
+ mysql> FLUSH PRIVILEGES;
+ mysql> exit;
+
+ DownloadSourcecode&InitializeDatabase.
+ # cd /tmp/
+ # git clone-b local https://github.com/hkhcoder/vprofile-project.git
+ # cd vprofile-project
+ # mysql-u root-padmin123 accounts < src/main/resources/db_backup.sql
+ # mysql-u root-padmin123 accounts
+ mysql> show tables;
+
+ mysql> exit;
+
+ Restartmariadb-server
+ # systemctl restart mariadb
+
+ Startingthefirewallandallowingthemariadbtoaccessfromportno.3306
+ # systemctl start firewalld
+ # systemctl enable firewalld
+ # firewall-cmd--get-active-zones
+ # firewall-cmd--zone=public--add-port=3306/tcp--permanent
+ # firewall-cmd--reload
+ # systemctl restart mariadb
